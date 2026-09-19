@@ -39,6 +39,14 @@
 };
 
 / {
+    // 右手側コンパイル時の「未定義ノード参照エラー」を回避するため、
+    // 左手側のoverlayでsensorsノードを登録します。
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&hires_dial_ext>;
+        triggers-per-rotation = <20>;
+    };
+
     leds {
         compatible = "gpio-leds";
         led_yellow: led_1 {
