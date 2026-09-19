@@ -30,3 +30,48 @@
         led = <&led_red>;
     };
 };
+
+/ {
+    /* 1. 物理的な3色LED（エクステンダー）のピン定義 */
+    leds {
+        compatible = "gpio-leds";
+        
+        ext_led_red: led_0 {
+            gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+            label = "Red LED";
+        };
+        ext_led_yellow: led_1 {
+            gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
+            label = "Yellow LED";
+        };
+        ext_led_green: led_2 {
+            gpios = <&gpio0 24 GPIO_ACTIVE_HIGH>;
+            label = "Green LED";
+        };
+    };
+
+    /* 2. 各レイヤーに連動して特定のLEDをONにするビヘイビアの定義 */
+    layer_leds {
+        compatible = "zmk,behavior-layer-led";
+
+        /* レイヤー3（デフォルト）のときに赤色LEDを点灯 */
+        layer3 _led {
+            layers = <3>;
+            leds = <&ext_led_red>;
+        };
+
+        /* レイヤー1のときに黄色LEDを点灯 */
+        layer1_led {
+            layers = <1>;
+            leds = <&ext_led_yellow>;
+        };
+
+        /* レイヤー2のときに緑色LEDを点灯 */
+        layer2_led {
+            layers = <2>;
+            leds = <&ext_led_green>;
+        };
+        
+        /* レイヤー0のときは自動的に上記がすべてOFF（消灯）になります */
+    };
+};
