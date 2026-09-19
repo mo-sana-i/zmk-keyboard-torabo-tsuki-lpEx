@@ -6,50 +6,66 @@
     input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
 };
 
-/ {
-    /* 1. 物理的なLEDのピン定義（赤・黄に加えて、緑を追加） */
-    leds {
-        compatible = "gpio-leds";
-        
-        ext_led_red: led_0 {
-            gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
-            label = "Red LED";
-        };
+#include <dt-bindings/pinctrl/nrf-pinctrl.h>
 
-        ext_led_yellow: led_1 {
-            gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
-            label = "Yellow LED";
-        };
-
-        ext_led_green: led_2 {
-            gpios = <&gpio0 24 GPIO_ACTIVE_HIGH>;
-            label = "Green LED";
+&pinctrl {
+    i2c0_default_ext: i2c0_default_ext {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 29)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 31)>;
         };
     };
-
-    /* 2. レイヤー連動の設定（レイヤー1, 2, 3の定義） */
-    layer_leds {
-        compatible = "zmk,behavior-layer-led";
-
-        /* レイヤー1のときに黄色LEDを点灯 */
-        layer1_led {
-            layers = <1>;
-            leds = <&ext_led_yellow>;
+    i2c0_sleep_ext: i2c0_sleep_ext {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 29)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 31)>;
+            low-power-enable;
         };
-
-        /* レイヤー2のときに緑色LEDを点灯 */
-        layer2_led {
-            layers = <2>;
-            leds = <&ext_led_green>;
-        };
-
-        /* レイヤー3のときに赤色LEDを点灯 */
-        layer3_led {
-            layers = <3>;
-            leds = <&ext_led_red>;
-        };
-
-        /* レイヤー0のときは、ここに記述がないため自動的にすべて消灯します */
     };
 };
 
+&i2c0 {
+    status = "okay";
+    compatible = "nordic,nrf-twi";
+    pinctrl-0 = <&i2c0_default_ext>;
+    pinctrl-1 = <&i2c0_sleep_ext>;
+    pinctrl-names = "default", "sleep";
+    
+    hires_dial_ext: hires_dial@75 {
+        compatible = "sekigon,hires-dial";
+        reg = <0x75>;
+        int-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+    };
+};
+
+/ {
+    leds {
+        compatible = "gpio-leds";
+        led_yellow: led_1 {
+            gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
+        };
+        led_green: led_2 {
+            gpios = <&gpio0 24 GPIO_ACTIVE_HIGH>;
+        };
+        led_red: led_3 {
+            gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+        };
+    };
+
+    layer_leds {
+        compatible = "zmk,behavior-layer-led";
+        
+        layer_1 {
+            layer = <1>;
+            leds = <&led_yellow>;
+        };
+        layer_2 {
+            layer = <2>;
+            leds = <&led_green>;
+        };
+        layer_3 {
+            layer = <3>;
+            leds = <&led_red>;
+        };
+    };
+};
