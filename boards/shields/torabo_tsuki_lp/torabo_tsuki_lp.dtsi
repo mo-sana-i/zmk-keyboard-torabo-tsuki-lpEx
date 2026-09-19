@@ -161,31 +161,3 @@
     transform = <&size_l_transform>;
 };
 
-#include <dt-bindings/zmk/keys.h>
-#include <behaviors/hires_dial.dtsi>
-
-// GUIエディタの自動生成による上書き消去を回避するため、
-// dtsiファイルからDevicetreeのマージ機能を使って sensor-bindings を注入します。
-/ {
-    keymap {
-        layer_0 {
-            // レイヤー0：等倍スクロール
-            sensor-bindings = <&hires_dial_scroll 1 1>;
-        };
-
-        layer_1 {
-            // レイヤー1：10分の一スクロール
-            sensor-bindings = <&hires_dial_scroll 10 10>;
-        };
-
-        layer_2 {
-            // レイヤー2：ページの拡大/縮小（Ctrl + テンキーの+/-）
-            sensor-bindings = <&inc_dec_kp LC(KP_PLUS) LC(KP_MINUS)>;
-        };
-
-        layer_3 {
-            // レイヤー3：Windows ラジアルコントローラー
-            sensor-bindings = <&hires_dial_radial_controller 4 1>;
-        };
-    };
-};
