@@ -7,7 +7,7 @@
 };
 
 / {
-    /* 1. 物理的なLEDのピン定義（赤に加えて黄色を追加） */
+    /* 1. 物理的なLEDのピン定義（赤・黄に加えて、緑を追加） */
     leds {
         compatible = "gpio-leds";
         
@@ -20,9 +20,14 @@
             gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
             label = "Yellow LED";
         };
+
+        ext_led_green: led_2 {
+            gpios = <&gpio0 24 GPIO_ACTIVE_HIGH>;
+            label = "Green LED";
+        };
     };
 
-    /* 2. レイヤー連動の設定（レイヤー1のときに黄色を点灯） */
+    /* 2. レイヤー連動の設定（レイヤー1, 2, 3の定義） */
     layer_leds {
         compatible = "zmk,behavior-layer-led";
 
@@ -32,9 +37,19 @@
             leds = <&ext_led_yellow>;
         };
 
-        /* 
-         * レイヤー0（デフォルト）、および記述のないレイヤー2や3のときは、
-         * 自動的にすべてのLEDが消灯（点灯しない状態）になります。
-         */
+        /* レイヤー2のときに緑色LEDを点灯 */
+        layer2_led {
+            layers = <2>;
+            leds = <&ext_led_green>;
+        };
+
+        /* レイヤー3のときに赤色LEDを点灯 */
+        layer3_led {
+            layers = <3>;
+            leds = <&ext_led_red>;
+        };
+
+        /* レイヤー0のときは、ここに記述がないため自動的にすべて消灯します */
     };
 };
+
