@@ -24,20 +24,11 @@
             label = "Green LED";
         };
     };
-    /* ZMKのステータスLED機能に赤色LEDを紐付ける設定 */
-    status_led_red {
-        compatible = "zmk,status-led";
-        led = <&led_red>;
-    };
-};
-
-/ {
-
     /* 2. 各レイヤーに連動して特定のLEDをONにするビヘイビアの定義 */
     layer_leds {
         compatible = "zmk,behavior-layer-led";
 
-        /* レイヤー3（デフォルト）のときに赤色LEDを点灯 */
+        /* レイヤー3Zのときに赤色LEDを点灯 */
         layer3 _led {
             layers = <3>;
             leds = <&ext_led_red>;
