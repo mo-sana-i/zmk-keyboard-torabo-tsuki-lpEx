@@ -5,3 +5,28 @@
 &pointing_listener {
     input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
 };
+
+/ {
+    /* 物理的な3色LEDのピン割り当て定義 */
+    leds {
+        compatible = "gpio-leds";
+        
+        led_red: led_0 {
+            gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+            label = "Red LED";
+        };
+        led_yellow: led_1 {
+            gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
+            label = "Yellow LED";
+        };
+        led_green: led_2 {
+            gpios = <&gpio0 24 GPIO_ACTIVE_HIGH>;
+            label = "Green LED";
+        };
+    };
+    /* ZMKのステータスLED機能に赤色LEDを紐付ける設定 */
+    status_led_red {
+        compatible = "zmk,status-led";
+        led = <&led_red>;
+    };
+};
