@@ -2,7 +2,6 @@
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/pinctrl/nrf-pinctrl.h>
-#include <behaviors/hires_dial.dtsi> /* 追加: 高分解能ダイヤルのビヘイビアを読み込み */
 
 &pointing_listener {
     input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
@@ -34,22 +33,11 @@
     hires_dial_ext: hires_dial@75 {
         compatible = "sekigon,hires-dial";
         reg = <0x75>;
-        /* 修正: 公式ドライバ仕様に合わせた必須パラメータの設定 */
-        res-cpi = <1275>;
-        counts-per-revolution = <1275>;
-        motion-read-interval-ms = <8>;
-        motion-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        int-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
     };
 };
 
 / {
-    /* 追加: 左手ビルド時のみセンサーを登録（右手ビルドのエラーを完全回避） */
-    sensors: sensors {
-        compatible = "zmk,keymap-sensors";
-        sensors = <&hires_dial_ext>;
-        triggers-per-rotation = <20>;
-    };
-
     leds {
         compatible = "gpio-leds";
         led_yellow: led_1 {
@@ -79,39 +67,4 @@
             leds = <&led_red>;
         };
     };
-};
-
-/* ========================================================================= */
-/* 以下、すべて追加箇所：ダイヤル挙動の定義とキーマップへの安全な注入処理        */
-/* ========================================================================= */
-
-/* 追加: 公式ドライバの仕様通り、使用するビヘイビアにセンサーを紐付け */
-&hires_dial_scroll {
-    sensor = <&hires_dial_ext>;
-};
-
-&hires_dial_radial_controller {
-    sensor = <&hires_dial_ext>;
-};
-
-/* 追加: DeviceTreeの絶対パス指定を使い、.keymapファイルを触らずに外からバインディングを注入 */
-&{/keymap/layer_0} {
-    sensor-bindings = <&hires_dial_scroll 1 1>;
-};
-
-&{/keymap/layer_1} {
-    /* 注意: 1/10スクロールにする場合、公式指定では <10 1> が正解です。
-       <入力カウント数  ホイール出力数> の順なので、10入力で1出力とすることで 1/10 になります。
-       (もし <1 10> にすると、1入力で10スクロールする「10倍速」になってしまいます) */
-    sensor-bindings = <&hires_dial_scroll 10 1>;
-};
-
-&{/keymap/layer_2} {
-    /* レイヤー2：ページの拡大 / 縮小 */
-    sensor-bindings = <&inc_dec_kp LC(KP_PLUS) LC(KP_MINUS)>;
-};
-
-&{/keymap/layer_3} {
-    /* レイヤー3：ラジアルコントローラー (公式通り物理回転を1/4に縮小) */
-    sensor-bindings = <&hires_dial_radial_controller 4 1>;
 };
