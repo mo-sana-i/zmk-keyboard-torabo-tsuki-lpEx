@@ -3,6 +3,7 @@
 #include "torabo_tsuki_lp.dtsi"
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
+#include <dt-bindings/pinctrl/nrf-pinctrl.h>
 
 &pointing_listener {
     input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
@@ -27,8 +28,49 @@
     col-offset = <7>;
 };
 
+/* --- ここから追加: 左手と同じI2Cピンとダイヤルハードウェアの定義 --- */
+&pinctrl {
+    i2c1_default_ext: i2c1_default_ext {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 29)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 31)>;
+        };
+    };
+    i2c1_sleep_ext: i2c1_sleep_ext {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 29)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 31)>;
+            low-power-enable;
+        };
+    };
+};
+
+&i2c1 {
+    status = "okay";
+    compatible = "nordic,nrf-twi";
+    pinctrl-0 = <&i2c1_default_ext>;
+    pinctrl-1 = <&i2c1_sleep_ext>;
+    pinctrl-names = "default", "sleep";
+    
+    hires_dial_ext: hires_dial@75 {
+        compatible = "sekigon,hires-dial";
+        reg = <0x75>;
+        /* ドライバ動作のための必須プロパティ */
+        res-cpi = <1275>;
+        counts-per-revolution = <1275>;
+        motion-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+    };
+};
+/* --- 追加ここまで --- */
+
 / {
-    /* 1. 物理的なLEDのピン定義（赤・黄に加えて、緑を追加） */
+    /* 右手側でもセンサーとして登録（モジュール換装時に機能します） */
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&hires_dial_ext>;
+        triggers-per-rotation = <20>;
+    };
+
     leds {
         compatible = "gpio-leds";
         
@@ -48,48 +90,22 @@
         };
     };
 
-    /* 2. レイヤー連動の設定（レイヤー1, 2, 3の定義） */
     layer_leds {
         compatible = "zmk,behavior-layer-led";
 
-        /* レイヤー1のときに黄色LEDを点灯 */
         layer1_led {
             layers = <1>;
             leds = <&ext_led_yellow>;
         };
 
-        /* レイヤー2のときに緑色LEDを点灯 */
         layer2_led {
             layers = <2>;
             leds = <&ext_led_green>;
         };
 
-        /* レイヤー3のときに赤色LEDを点灯 */
         layer3_led {
             layers = <3>;
             leds = <&ext_led_red>;
         };
-    };
-};
-
-/* --- 以下、今回の右手ビルドエラー回避用のダミー追加分（完全修正版） --- */
-/ {
-    /* keymap.keymap から呼ばれる「存在しないハードウェア」の怒られ回避用ダミー定義 */
-    /* 左手と同じ sekigon,hires-dial を名乗ることでリンクエラーを防ぎ、status="disabled"で無効化します */
-    dummy_hardware {
-        hires_dial_ext: hires_dial_ext {
-            compatible = "sekigon,hires-dial";
-            status = "disabled";
-            res-cpi = <1275>;
-            counts-per-revolution = <1275>;
-            motion-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-        };
-    };
-
-    /* 右手側にはセンサーが物理的に存在しないため上記のダミーを割り当て */
-    sensors: sensors {
-        compatible = "zmk,keymap-sensors";
-        sensors = <&hires_dial_ext>;
-        triggers-per-rotation = <20>;
     };
 };
