@@ -1,11 +1,15 @@
 /* メイン基板のFFCコネクタ（I2C0）にダイヤルモジュールを接続する設定 */
 &i2c0 {
     status = "okay";
+    compatible = "nordic,nrf-twim";
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
+    clock-frequency = <100000>;
     
     hires_dial_ext: hires_dial@75 {
         compatible = "sekigon,hires-dial";
         reg = <0x75>;
-        /* ドライバ動作のための必須プロパティ */
         res-cpi = <1275>;
         counts-per-revolution = <1275>;
         /* メイン基板FFCコネクタの標準割り込みピン（トラックパッドと共通） */
