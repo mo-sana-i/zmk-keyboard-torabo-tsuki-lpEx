@@ -160,5 +160,3 @@
     kscan = <&kscan0>;
     transform = <&size_l_transform>;
 };
-
-};
