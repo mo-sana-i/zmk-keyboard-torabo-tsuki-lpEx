@@ -4,9 +4,20 @@
 #include <dt-bindings/pinctrl/nrf-pinctrl.h>
 
 &pointing_listener {
-    input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
+    /* デフォルトの動作：ここでスクロールに変換してしまう（レイヤー0, 1, 2で有効） */
+    input-processors = <
+        &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)
+        &zip_xy_to_scroll_mapper
+    >;
+    
+    /* レイヤー3の動作：スクロール変換を行わず、純粋なポインティング（カーソル移動）に戻す */
+    pointer {
+        layers = <3>;
+        input-processors = <
+            &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)
+        >;
+    };
 };
-
 /* --- 修正: i2c0 ではなく i2c1 用のピン設定に変更 --- */
 &pinctrl {
     i2c1_default_ext: i2c1_default_ext {
