@@ -69,21 +69,30 @@
             layers = <3>;
             leds = <&ext_led_red>;
         };
-
-        /* レイヤー0のときは、ここに記述がないため自動的にすべて消灯します */
     };
 };
 
-/* 右手ビルド時の sensor-bindings エラー回避用ダミー定義 */
+/* --- 以下、今回の右手ビルドエラー回避用のダミー追加分 --- */
 / {
+    /* ダミーのセンサー用ビヘイビア */
     dummy_sensor: dummy_sensor {
         compatible = "zmk,behavior-sensor-rotate";
         #sensor-binding-cells = <0>;
     };
 
+    /* 右手側にはセンサーが物理的に存在しないためダミーを割り当て */
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&dummy_sensor>;
         triggers-per-rotation = <20>;
+    };
+
+    /* keymap.keymap から呼ばれる「存在しないハードウェア」の怒られ回避用ダミー定義 */
+    /* ※status = "disabled" なので実際のファームウェア動作には影響しません */
+    dummy_hardware {
+        hires_dial_ext: hires_dial_ext {
+            compatible = "sekigon,hires-dial";
+            status = "disabled";
+        };
     };
 };
