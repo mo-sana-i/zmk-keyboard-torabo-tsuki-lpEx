@@ -15,26 +15,6 @@
         power-gpios = <&gpio0 8 (GPIO_ACTIVE_HIGH | NRF_GPIO_DRIVE_H1)>;
         init-symbol = "mini_trackpad_iqs7211e_init";
         init-length = <217>;
-        /* scroller-mode; を削除し、純粋なポインティングデバイスとして出力させます */
-    };
-};
-
-/* トラックパッド用のリスナー設定をスニペット内に記述します */
-&pointing_listener {
-    /* 念のため既存の設定をリセット */
-    /delete-property/ input-processors;
-
-    /* ベースの動作：ポインティング（カーソル移動）。レイヤー3の時はこちらが有効になります */
-    input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
-
-    /* レイヤー3以外の時（つまり通常時）はスクロールに変換する */
-    scroller {
-        compatible = "zmk,input-processor-scroll-mapper";
-        /* トラックパッドをスクロールとして使いたいレイヤーを指定 */
-        layers = <0 1 2>;
-        input-processors = <
-            &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)
-            &zip_xy_to_scroll_mapper
-        >;
+        scroller-mode;
     };
 };
