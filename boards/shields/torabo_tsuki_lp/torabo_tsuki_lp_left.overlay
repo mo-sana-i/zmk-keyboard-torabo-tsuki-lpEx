@@ -33,11 +33,22 @@
     hires_dial_ext: hires_dial@75 {
         compatible = "sekigon,hires-dial";
         reg = <0x75>;
-        int-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        /* ドライバ動作のための必須プロパティ */
+        res-cpi = <1275>;
+        counts-per-revolution = <1275>;
+        motion-read-interval-ms = <8>;
+        motion-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
     };
 };
 
 / {
+    /* 左手側のみセンサーとして登録 */
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&hires_dial_ext>;
+        triggers-per-rotation = <20>;
+    };
+
     leds {
         compatible = "gpio-leds";
         led_yellow: led_1 {
