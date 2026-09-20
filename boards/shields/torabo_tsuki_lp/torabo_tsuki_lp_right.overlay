@@ -72,12 +72,14 @@
     };
 };
 
-/* --- 以下、今回の右手ビルドエラー回避用のダミー追加分 --- */
+/* --- 以下、今回の右手ビルドエラー回避用のダミー追加分（修正版） --- */
 / {
     /* ダミーのセンサー用ビヘイビア */
     dummy_sensor: dummy_sensor {
         compatible = "zmk,behavior-sensor-rotate";
         #sensor-binding-cells = <0>;
+        /* 修正: コンパイラエラーを回避するための必須プロパティを追加 */
+        bindings = <&none>;
     };
 
     /* 右手側にはセンサーが物理的に存在しないためダミーを割り当て */
@@ -88,7 +90,6 @@
     };
 
     /* keymap.keymap から呼ばれる「存在しないハードウェア」の怒られ回避用ダミー定義 */
-    /* ※status = "disabled" なので実際のファームウェア動作には影響しません */
     dummy_hardware {
         hires_dial_ext: hires_dial_ext {
             compatible = "sekigon,hires-dial";
