@@ -1,9 +1,30 @@
-/* メイン基板のFFCコネクタ（I2C0）にダイヤルモジュールを接続する設定 */
-&i2c0 {
+/* メイン基板のFFCコネクタにダイヤルモジュールを接続する設定 */
+/* SPI0とのリソース競合を避けるため、I2C1としてハードウェアを定義します */
+
+&pinctrl {
+    /* メイン基板FFCコネクタのI2Cピン（P0.18, P0.16）をI2C1として再定義 */
+    i2c1_default_ext: i2c1_default_ext {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 18)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 16)>;
+            bias-pull-up;
+        };
+    };
+    i2c1_sleep_ext: i2c1_sleep_ext {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 18)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 16)>;
+            bias-pull-up;
+            low-power-enable;
+        };
+    };
+};
+
+&i2c1 {
     status = "okay";
     compatible = "nordic,nrf-twim";
-    pinctrl-0 = <&i2c0_default>;
-    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-0 = <&i2c1_default_ext>;
+    pinctrl-1 = <&i2c1_sleep_ext>;
     pinctrl-names = "default", "sleep";
     clock-frequency = <100000>;
     
