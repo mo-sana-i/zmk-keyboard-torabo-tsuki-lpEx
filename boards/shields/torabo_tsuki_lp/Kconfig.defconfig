@@ -15,5 +15,13 @@ config INPUT
 
 config ZMK_MOUSE
     default y
- 
+
+config ZMK_HIRES_DIAL
+    default y
+config ZMK_HIRES_DIAL_SCROLL
+    default y
+config ZMK_HIRES_DIAL_RADIAL_CONTROLLER
+    default y
+
+
 endif
