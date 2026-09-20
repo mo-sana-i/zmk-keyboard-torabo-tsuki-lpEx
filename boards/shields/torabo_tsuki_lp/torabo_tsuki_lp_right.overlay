@@ -73,3 +73,17 @@
         /* レイヤー0のときは、ここに記述がないため自動的にすべて消灯します */
     };
 };
+
+/* 右手ビルド時の sensor-bindings エラー回避用ダミー定義 */
+/ {
+    dummy_sensor: dummy_sensor {
+        compatible = "zmk,behavior-sensor-rotate";
+        #sensor-binding-cells = <0>;
+    };
+
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&dummy_sensor>;
+        triggers-per-rotation = <20>;
+    };
+};
