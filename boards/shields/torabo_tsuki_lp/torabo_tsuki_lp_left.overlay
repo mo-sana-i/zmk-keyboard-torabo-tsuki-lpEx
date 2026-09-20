@@ -4,61 +4,10 @@
 #include <dt-bindings/pinctrl/nrf-pinctrl.h>
 
 &pointing_listener {
-    /* デフォルトの動作：ここでスクロールに変換してしまう（レイヤー0, 2, 3で有効） */
-    input-processors = <
-        &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)
-        &zip_xy_to_scroll_mapper
-    >;
-    
-    /* レイヤー1の動作：スクロール変換を行わず、純粋なポインティング（カーソル移動）に戻す */
-    pointer {
-        layers = <1>;
-        input-processors = <
-            &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)
-        >;
-    };
-};
-/* --- 修正: i2c0 ではなく i2c1 用のピン設定に変更 --- */
-&pinctrl {
-    i2c1_default_ext: i2c1_default_ext {
-        group1 {
-            psels = <NRF_PSEL(TWIM_SDA, 0, 29)>,
-                    <NRF_PSEL(TWIM_SCL, 0, 31)>;
-        };
-    };
-    i2c1_sleep_ext: i2c1_sleep_ext {
-        group1 {
-            psels = <NRF_PSEL(TWIM_SDA, 0, 29)>,
-                    <NRF_PSEL(TWIM_SCL, 0, 31)>;
-            low-power-enable;
-        };
-    };
-};
-
-/* --- 修正: 競合を避けるため &i2c1 を使用 --- */
-&i2c1 {
-    status = "okay";
-    compatible = "nordic,nrf-twi";
-    pinctrl-0 = <&i2c1_default_ext>;
-    pinctrl-1 = <&i2c1_sleep_ext>;
-    pinctrl-names = "default", "sleep";
-    
-    hires_dial_ext: hires_dial@75 {
-        compatible = "sekigon,hires-dial";
-        reg = <0x75>;
-        res-cpi = <1275>;
-        counts-per-revolution = <1275>;
-        motion-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-    };
+    input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
 };
 
 / {
-    sensors: sensors {
-        compatible = "zmk,keymap-sensors";
-        sensors = <&hires_dial_ext>;
-        triggers-per-rotation = <20>;
-    };
-
     leds {
         compatible = "gpio-leds";
         led_yellow: led_1 {
