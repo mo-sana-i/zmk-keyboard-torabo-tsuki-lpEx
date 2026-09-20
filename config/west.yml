@@ -31,6 +31,5 @@ manifest:
       remote: sekigon-gonnoc
     - name: zmk-driver-hires-dial
       remote: sekigon-gonnoc
-      revision: master   # ←★修正：mainからmasterに変更
   self:
     path: config
