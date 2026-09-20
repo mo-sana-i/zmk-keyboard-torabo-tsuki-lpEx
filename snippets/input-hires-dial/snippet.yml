@@ -1,0 +1,3 @@
+name: input-hires-dial
+append:
+  - input-hires-dial.overlay
