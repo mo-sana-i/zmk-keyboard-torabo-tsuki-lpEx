@@ -1,3 +1,4 @@
 name: input-hires-dial
 append:
-  DTC_OVERLAY_FILE: input-hires-dial.overlay
+  EXTRA_DTC_OVERLAY_FILE: input-hires-dial.overlay
+  EXTRA_CONF_FILE: input-hires-dial.conf
