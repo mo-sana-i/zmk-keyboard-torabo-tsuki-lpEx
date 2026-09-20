@@ -1,0 +1,22 @@
+/* メイン基板のFFCコネクタ（I2C0）にダイヤルモジュールを接続する設定 */
+&i2c0 {
+    status = "okay";
+    
+    hires_dial_ext: hires_dial@75 {
+        compatible = "sekigon,hires-dial";
+        reg = <0x75>;
+        /* ドライバ動作のための必須プロパティ */
+        res-cpi = <1275>;
+        counts-per-revolution = <1275>;
+        /* メイン基板FFCコネクタの標準割り込みピン（トラックパッドと共通） */
+        motion-gpios = <&gpio0 20 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+    };
+};
+
+/ {
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&hires_dial_ext>;
+        triggers-per-rotation = <20>;
+    };
+};
